@@ -60,7 +60,7 @@ class Zonetransfer(object):
 			dir_path = os.path.join(self.archives, hostname)
 		if not os.path.exists( dir_path ):
 			os.makedirs( dir_path )
-		filename = os.path.join(dir_path, now.strftime("%Y%m%d%H%M%S") + nameserver + "zone")
+		filename = os.path.join(dir_path, self.now.strftime("%Y%m%d%H%M%S") + nameserver + "zone")
 		logging.info("Write zonefile to " + filename)
 		file_handler = open( filename, "w" )
 		file_handler.write(
