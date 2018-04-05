@@ -53,7 +53,6 @@ class Zone2DB(object):
 						zonedict[rec[0]]['recs'].append([rec[2],rec[1],rec[3]])
 					except:
 						zonedict[rec[0]] = {'fk': 0, 'recs': [[rec[2],rec[1],rec[3]]]}
-		del zonedict
 		return zonedict
 		
 		
