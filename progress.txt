@@ -1,0 +1,9 @@
+#TLD info
+https://en.wikipedia.org/wiki/List_of_Internet_top-level_domains
+
+#Github
+https://github.com/mandatoryprogrammer/TLDR
+
+#Zonetransfer enabled (AXFR):
+
+Sweden,https://zonedata.iis.se/,zonedata.iis.se,[se,nu]
