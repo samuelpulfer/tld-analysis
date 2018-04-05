@@ -1,18 +1,72 @@
 #!/usr/bin/env python
 import psycopg2
+import logging
+import os
+import sys
 
 zonefile = "zonedata.iis.se.zone"
 
+domaindict = {'fk': 0, 'recs': []}
+
+class Zone2DB(object):
+	def __init__(self, zonefile):
+		self.zonefile = zonefile
+	
+	def readZonefile(self):
+		content = ""
+		with open(self.zonefile) as f:
+			content = f.readlines()
+		return content
+		
+	def readZonefile2arr(self, maxsize=10000)
+		content = readZonefile()
+		arr = []
+		i = 0
+		for line in content:
+			arr[i/maxsize].append(line)
+		return arr
+		
+	def recsplit(self, line):
+		line = line.replace("\t"," ").split()
+		value = ""
+		for x in line[4:]:
+			value = value + x + " "
+		value = value[:len(value)-1]
+		# return [domain, ttl, rectype, value]
+		return [line[0], int(line[1]), line[3].lower(), value]
+	
+	def parseZonefile(self):
+		zonedata = self.readZonefile()
+		zonedict = dict()
+		for line in zonedata:
+			line = line.split(";")
+			if (len(line[0]) != 0):
+				if (line[0] != "" and line[0] != "\n"):
+					rec = self.recsplit(line[0])
+					try:
+						zonedict[rec[0]]['recs'].append([rec[2],rec[1],rec[3]])
+					except:
+						zonedict[rec[0]] = {'fk': 0, 'recs': [[rec[2],rec[1],rec[3]]]}
+		del zonedata
+		return zonedict
+		
+		
+
+
+
+
+
+
+
+
 def recsplit(line):
 	line = line.replace("\t"," ").split()
-	domain = line[0]
-	ttl = int(line[1])
-	rectype = line[3]
 	value = ""
 	for x in line[4:]:
 		value = value + x + " "
 	value = value[:len(value)-1]
-	return [domain, ttl, rectype, value]
+	# return [domain, ttl, rectype, value]
+	return [line[0], int(line[1]), line[3].lower(), value]
 
 def readZonefile():
 	content = ""
@@ -20,7 +74,7 @@ def readZonefile():
 		content = f.readlines()
 	return content
 
-class SQLHelper:
+class SQLHelper(object):
 	def __init__(self):
 		self.conn = psycopg2.connect("dbname='dnsexample' user='dnsuser' host='localhost' password='dnspwd'")
 		self.cur = self.conn.cursor()
