@@ -44,7 +44,7 @@ class Zone2DB(object):
 	
 	def parseLineArr(self, lineArr):
 		zonedict = dict()
-		for line in zonedata:
+		for line in lineArr:
 			line = line.split(";")
 			if (len(line[0]) != 0):
 				if (line[0] != "" and line[0] != "\n"):
