@@ -1,9 +1,14 @@
+CREATE TABLE settings
+(
+  setting character varying(20),
+  value	character varying(50)
+);
 CREATE TABLE domain
 (
   id bigserial PRIMARY KEY,
   name character varying(255) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 -- Record type tables
@@ -15,7 +20,7 @@ CREATE TABLE rectype_a
   ttl INTEGER NOT NULL,
   value character varying(15) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_ns
@@ -25,7 +30,7 @@ CREATE TABLE rectype_ns
   ttl INTEGER NOT NULL,
   value character varying(255) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_cname
@@ -35,7 +40,7 @@ CREATE TABLE rectype_cname
   ttl INTEGER NOT NULL,
   value character varying(255) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_soa
@@ -51,7 +56,7 @@ CREATE TABLE rectype_soa
   expire INTEGER NOT NULL,
   soattl INTEGER NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_ptr
@@ -61,7 +66,7 @@ CREATE TABLE rectype_ptr
   ttl INTEGER NOT NULL,
   value character varying(255) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_mx
@@ -71,7 +76,7 @@ CREATE TABLE rectype_mx
   ttl INTEGER NOT NULL,
   value character varying(255) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_txt
@@ -81,7 +86,7 @@ CREATE TABLE rectype_txt
   ttl INTEGER NOT NULL,
   value character varying(255) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_rp
@@ -91,7 +96,7 @@ CREATE TABLE rectype_rp
   ttl INTEGER NOT NULL,
   value character varying(255) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_afsdb
@@ -101,7 +106,7 @@ CREATE TABLE rectype_afsdb
   ttl INTEGER NOT NULL,
   value character varying(255) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_sig
@@ -109,9 +114,9 @@ CREATE TABLE rectype_sig
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_key
@@ -119,9 +124,9 @@ CREATE TABLE rectype_key
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_aaaa
@@ -131,7 +136,7 @@ CREATE TABLE rectype_aaaa
   ttl INTEGER NOT NULL,
   value character varying(39) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_loc
@@ -141,7 +146,7 @@ CREATE TABLE rectype_loc
   ttl INTEGER NOT NULL,
   value character varying(100) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_srv
@@ -151,7 +156,7 @@ CREATE TABLE rectype_srv
   ttl INTEGER NOT NULL,
   value character varying(255) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_naptr
@@ -161,7 +166,7 @@ CREATE TABLE rectype_naptr
   ttl INTEGER NOT NULL,
   value character varying(255) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_kx
@@ -171,7 +176,7 @@ CREATE TABLE rectype_kx
   ttl INTEGER NOT NULL,
   value character varying(255) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_cert
@@ -179,9 +184,9 @@ CREATE TABLE rectype_cert
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_dname
@@ -191,7 +196,7 @@ CREATE TABLE rectype_dname
   ttl INTEGER NOT NULL,
   value character varying(255) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_apl
@@ -199,9 +204,9 @@ CREATE TABLE rectype_apl
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_ds
@@ -209,9 +214,9 @@ CREATE TABLE rectype_ds
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_sshfp
@@ -219,9 +224,9 @@ CREATE TABLE rectype_sshfp
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_ipseckey
@@ -229,9 +234,9 @@ CREATE TABLE rectype_ipseckey
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_rrsig
@@ -239,9 +244,9 @@ CREATE TABLE rectype_rrsig
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_nsec
@@ -249,9 +254,9 @@ CREATE TABLE rectype_nsec
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_dnskey
@@ -259,9 +264,9 @@ CREATE TABLE rectype_dnskey
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_dhcid
@@ -269,9 +274,9 @@ CREATE TABLE rectype_dhcid
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_nsec3
@@ -279,9 +284,9 @@ CREATE TABLE rectype_nsec3
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_nsec3param
@@ -289,9 +294,9 @@ CREATE TABLE rectype_nsec3param
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_tlsa
@@ -299,9 +304,9 @@ CREATE TABLE rectype_tlsa
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_hip
@@ -309,9 +314,9 @@ CREATE TABLE rectype_hip
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_cds
@@ -319,9 +324,9 @@ CREATE TABLE rectype_cds
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_cdnskey
@@ -329,9 +334,9 @@ CREATE TABLE rectype_cdnskey
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_openpgpkey
@@ -339,9 +344,9 @@ CREATE TABLE rectype_openpgpkey
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_tkey
@@ -349,9 +354,9 @@ CREATE TABLE rectype_tkey
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_tsig
@@ -359,9 +364,9 @@ CREATE TABLE rectype_tsig
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_uri
@@ -371,7 +376,7 @@ CREATE TABLE rectype_uri
   ttl INTEGER NOT NULL,
   value character varying(255) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_cca
@@ -379,9 +384,9 @@ CREATE TABLE rectype_cca
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_ta
@@ -389,9 +394,9 @@ CREATE TABLE rectype_ta
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 CREATE TABLE rectype_dlv
@@ -399,9 +404,9 @@ CREATE TABLE rectype_dlv
   id bigserial PRIMARY KEY,
   fk_domain bigint,
   ttl INTEGER NOT NULL,
-  value character varying(500) NOT NULL,
+  value character varying(512) NOT NULL,
   created timestamp without time zone,
-  modified timestamp without time zone,
+  checked timestamp without time zone,
   deleted timestamp without time zone
 );
 
