@@ -72,7 +72,7 @@ class Zonetransfer(object):
 		for zone in zoneconfig.ZONE:
 			zone_data = self.get_dig_axfr_output(zone,zoneconfig.ZONE[zone])
 			if self.zone_transfer_succeeded(zone_data):
-				self.write_dig_output(self, zone, zoneconfig.ZONE[zone], zone_data)
+				self.write_dig_output(zone, zoneconfig.ZONE[zone], zone_data)
 				
 
 	
