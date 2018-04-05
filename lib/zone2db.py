@@ -18,7 +18,7 @@ class Zone2DB(object):
 			content = f.readlines()
 		return content
 		
-	def readZonefile2arr(self, maxsize=10000)
+	def readZonefile2arr(self, maxsize=10000):
 		content = readZonefile()
 		arr = []
 		i = 0
