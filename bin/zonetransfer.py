@@ -21,7 +21,7 @@ class Zonetransfer(object):
 		self.now = datetime.now()
 	
 	def get_dig_axfr_output(self, hostname, nameserver):
-		logging.info("Start zonetransfer for %s on %s" (hostname, nameserver))
+		logging.info("Start zonetransfer for %s on %s" %(hostname, nameserver))
 		proc = subprocess.Popen(["/usr/bin/dig", "AXFR", hostname, "@" + nameserver, "+nocomments", "+nocmd", "+noquestion", "+nostats", "+time=15"], stdout=subprocess.PIPE)
 		output = proc.stdout.read()
 		return output
