@@ -19,11 +19,18 @@ class Zone2DB(object):
 		return content
 		
 	def readZonefile2arr(self, maxsize=10000):
-		content = readZonefile()
+		content = self.readZonefile()
 		arr = []
 		i = 0
 		for line in content:
-			arr[i/maxsize].append(line)
+			try:
+				arr[i/maxsize].append(line)
+				i += 1
+			except:
+				arr.append([])
+				arr[i/maxsize].append(line)
+				i += 1
+		del content
 		return arr
 		
 	def recsplit(self, line):
@@ -35,8 +42,7 @@ class Zone2DB(object):
 		# return [domain, ttl, rectype, value]
 		return [line[0], int(line[1]), line[3].lower(), value]
 	
-	def parseZonefile(self):
-		zonedata = self.readZonefile()
+	def parseLineArr(self, lineArr):
 		zonedict = dict()
 		for line in zonedata:
 			line = line.split(";")
@@ -47,7 +53,7 @@ class Zone2DB(object):
 						zonedict[rec[0]]['recs'].append([rec[2],rec[1],rec[3]])
 					except:
 						zonedict[rec[0]] = {'fk': 0, 'recs': [[rec[2],rec[1],rec[3]]]}
-		del zonedata
+		del zonedict
 		return zonedict
 		
 		
