@@ -90,7 +90,7 @@ class SQLHelper(object):
 				self.cur.execute("UPDATE domain SET checked=%s WHERE id=%s RETURNING id", (self.timestamp, zonedict[domain]['fk']))
 			else:
 				self.cur.execute("INSERT INTO domain (name,created,checked) VALUES (%s,%s,%s) RETURNING id", (domain, self.timestamp, self.timestamp))
-				domain['fk'] = self.cur.fetchone()[0]
+				zonedict[domain]['fk'] = self.cur.fetchone()[0]
 		self.conn.commit()
 		return
 
