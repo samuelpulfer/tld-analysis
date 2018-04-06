@@ -5,10 +5,6 @@ import os
 import sys
 from datetime import datetime
 
-zonefile = "zonedata.iis.se.zone"
-
-domaindict = {'fk': 0, 'recs': []}
-
 class Zone2DB(object):
 	def __init__(self, zonefile):
 		self.zonefile = zonefile
@@ -20,18 +16,22 @@ class Zone2DB(object):
 		return content
 		
 	def readZonefile2arr(self, maxsize=10000):
-		content = self.readZonefile()
-		arr = []
+		arr = [[]]
 		i = 0
-		for line in content:
-			try:
-				arr[i/maxsize].append(line)
+		ai = 0
+		with open(self.zonefile, "r") as f:
+			for line in f:
+				arr[ai].append(line)
 				i += 1
-			except:
-				arr.append([])
-				arr[i/maxsize].append(line)
-				i += 1
-		del content
+				if i == maxsize:
+					arr.append([])
+					lastDomain = arr[ai][len(arr[ai]) -1].replace("\t"," ").split()[0]
+					ii = 0
+					while lastDomain == arr[ai][len(arr[ai]) -1].replace("\t"," ").split()[0]:
+						arr[ai+1].append(arr[ai].pop())
+						ii += 1
+					i = ii
+					ai += 1
 		return arr
 		
 	def recsplit(self, line):
