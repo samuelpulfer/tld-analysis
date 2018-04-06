@@ -8,14 +8,14 @@ import logging
 maxthreads = 10
 TIMESTAMP = "2018-04-05 22:46:11"
 
-def doit():
+def doit(zonefile):
 	LOGFILE = os.path.join(os.path.dirname(__file__),'..','var','zone2db.log')
 	logging.basicConfig(format='%(asctime)s %(message)s', filename=LOGFILE, level=logging.INFO)
-	z2d = zone2db.Zone2DB("../archives/se/20180405224611_zonedata.iis.se.zone")
+	z2d = zone2db.Zone2DB(zonefile)
 	logging.info("reading zonefile to array")
 	arr = z2d.readZonefile2arr()
 	logging.info(str(len(arr)) + " packages to process")
-	"""
+	
 	threads = []
 	for x in range(0,maxthreads):
 		threads.append(parsethread(TIMESTAMP,"Thread " + str(x)))
@@ -23,7 +23,7 @@ def doit():
 	while arr != []:
 		logging.info(str(len(arr)) + " packages to process")
 		for x in threads:
-			if x.isRunning != True:
+			if x.isRunning() != True:
 				thread.start_new_thread(x.parse, (arr.pop(),))
 				break
 		time.sleep(1)
@@ -32,7 +32,7 @@ def doit():
 	while arr!= []:
 		logging.info(str(len(arr)) + " packages to process")
 		sql.parse(arr.pop())
-
+"""
 class parsethread(object):
 	def __init__(self, timestamp, name):
 		self.name = name
@@ -80,8 +80,9 @@ class parsethread(object):
 			logging.info("Thread: " + self.name + " upsert domains.")
 			self.sqlh.upsertDomain(zonedict)
 			logging.info("Thread: " + self.name + " upsert domains finished.")
-		except:
+		except Exception, e:
 			logging.error("Thread: " + self.name + " query domain or upsert failed.")
+			logging.error("Thread: " + self.name + " " + str(e))
 		self.running = False
 			
 

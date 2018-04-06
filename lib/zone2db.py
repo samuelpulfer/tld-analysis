@@ -5,6 +5,9 @@ import os
 import sys
 from datetime import datetime
 
+sys.path.append(os.path.join(os.path.dirname(__file__),'..','etc'))
+import settings
+
 class Zone2DB(object):
 	def __init__(self, zonefile):
 		self.zonefile = zonefile
@@ -58,7 +61,7 @@ class Zone2DB(object):
 
 class SQLHelper(object):
 	def __init__(self, timestamp):
-		self.conn = psycopg2.connect("dbname='dns'")
+		self.conn = psycopg2.connect(settings.DBConnection)
 		self.cur = self.conn.cursor()
 		self.timestamp = timestamp
 
@@ -79,6 +82,7 @@ class SQLHelper(object):
 
 	def selectDomainId(self,zonedict):
 		for domain in zonedict:
+			#logging.info("SELECT id FROM domain WHERE name="+str(domain)+" AND deleted IS NULL")
 			self.cur.execute("SELECT id FROM domain WHERE name=%s AND deleted IS NULL", (domain,))
 			recid = self.cur.fetchone()
 			if recid:
@@ -87,8 +91,10 @@ class SQLHelper(object):
 	def upsertDomain(self, zonedict):
 		for domain in zonedict:
 			if zonedict[domain]['fk'] != 0:
+				#logging.info("UPDATE domain SET checked="+str(self.timestamp)+" WHERE id="+str(zonedict[domain]['fk'])+" RETURNING id")
 				self.cur.execute("UPDATE domain SET checked=%s WHERE id=%s RETURNING id", (self.timestamp, zonedict[domain]['fk']))
 			else:
+				#logging.info("INSERT INTO domain (name,created,checked) VALUES ("+str(domain)+","+str(self.timestamp)+","+str(self.timestamp)+") RETURNING id")
 				self.cur.execute("INSERT INTO domain (name,created,checked) VALUES (%s,%s,%s) RETURNING id", (domain, self.timestamp, self.timestamp))
 				zonedict[domain]['fk'] = self.cur.fetchone()[0]
 		self.conn.commit()
