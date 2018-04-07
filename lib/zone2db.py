@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import psycopg2
+from psycopg2.extras import execute_batch
 import logging
 import os
 import sys
@@ -99,7 +100,28 @@ class SQLHelper(object):
 				zonedict[domain]['fk'] = self.cur.fetchone()[0]
 		self.conn.commit()
 		return
-
+		
+	def updateDomain(self, zonedict):
+		params = []
+		for domain in zonedict:
+			params.append([self.timestamp, zonedict[domain]['fk']])
+		execute_batch(self.cur, "UPDATE domain SET checked=%s WHERE id=%s", params)
+		self.conn.commit()
+		
+	def insertDomain(self, zonedict):
+		for domain in zonedict:
+			self.cur.execute("INSERT INTO domain (name,created,checked) VALUES (%s,%s,%s) RETURNING id", (domain, self.timestamp, self.timestamp))
+			zonedict[domain]['fk'] = self.cur.fetchone()[0]
+		self.conn.commit()
+		
+		
+		
+	def upsertDomain2(self,zonedict):
+		params = []
+		for domain in zonedict:
+			params.append([domain,self.timestamp])
+		execute_batch(self.cur, "SELECT upsert_domain(%s,%s)", params)
+		self.conn.commit()
 
 
 

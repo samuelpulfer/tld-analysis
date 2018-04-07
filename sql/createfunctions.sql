@@ -8,7 +8,7 @@ DECLARE
 BEGIN
  LOOP
         -- first try to update the key
-        UPDATE domain SET checked = aTimestamp WHERE name = aName RETURNING id INTO return_id;
+        UPDATE domain SET checked = aTimestamp WHERE name = aName AND deleted IS NULL RETURNING id INTO return_id;
         IF found THEN
             RETURN return_id;
         END IF;

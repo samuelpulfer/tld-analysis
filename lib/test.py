@@ -15,18 +15,41 @@ def doit(zonefile):
 	logging.info("reading zonefile to array")
 	arr = z2d.readZonefile2arr()
 	logging.info(str(len(arr)) + " packages to process")
-	
+	domainDict = {}
 	threads = []
+	# Prepare threads
 	for x in range(0,maxthreads):
 		threads.append(parsethread(TIMESTAMP,"Thread " + str(x)))
-		
+	# Select IDs	
 	while arr != []:
 		logging.info(str(len(arr)) + " packages to process")
 		for x in threads:
-			if x.isRunning() != True:
+			if x.isRunning() == False:
+				if arr == []:
+					break
 				thread.start_new_thread(x.parse, (arr.pop(),))
-				break
-		time.sleep(1)
+		if arr == []:
+			break
+		time.sleep(0.2)
+
+			
+	# Write to db
+	logging.info("################## Update DB ##################")
+	for x in threads:
+		thread.start_new_thread(x.splitUpdateInsert,("",))
+		
+	# Wait untill all threads finished
+	tstop = maxthreads
+	while tstop != 0:
+		tstop = maxthreads
+		for x in threads:
+			if x.isRunning() == False:
+				tstop -= 1
+	allZoneDict = {}
+	for x in threads:
+		allZoneDict.update(x.getZoneDictResult())
+	
+	return allZoneDict
 """
 	sql = parsethread(TIMESTAMP,"Thread 0")
 	while arr!= []:
@@ -38,6 +61,8 @@ class parsethread(object):
 		self.name = name
 		self.running = False
 		self.sqlh = zone2db.SQLHelper(timestamp)
+		self.zoneDictResult = {}
+		self.zoneDictUpdate = {}
 		logging.info("Thread: " + self.name + " created.")
 		
 	def __del__(self):
@@ -46,6 +71,21 @@ class parsethread(object):
 		
 	def isRunning(self):
 		return self.running
+
+	def getZoneDictResult(self):
+		return {self.name:{'insert':self.zoneDictResult, 'update':self.zoneDictUpdate}}
+		
+	def splitUpdateInsert(self, something):
+		while self.running == True:
+			time.sleep(1)
+		self.running = True
+		for x in self.zoneDictResult.keys():
+			if self.zoneDictResult[x]['fk'] != 0:
+				self.zoneDictUpdate[x] = dict(self.zoneDictResult[x])
+				del self.zoneDictResult[x]
+		self.update()
+		self.insert()
+		self.running = False
 		
 	def recsplit(self, line):
 		line = line.replace("\t"," ").split()
@@ -77,18 +117,29 @@ class parsethread(object):
 		try:
 			logging.info("Thread: " + self.name + " query domain PKs.")
 			self.sqlh.selectDomainId(zonedict)
-			logging.info("Thread: " + self.name + " upsert domains.")
-			self.sqlh.upsertDomain(zonedict)
-			logging.info("Thread: " + self.name + " upsert domains finished.")
+			#logging.info("Thread: " + self.name + " upsert domains.")
+			#self.sqlh.upsertDomain2(zonedict)
+			logging.info("Thread: " + self.name + " query domains finished.")
+			self.zoneDictResult.update(zonedict)
 		except Exception, e:
 			logging.error("Thread: " + self.name + " query domain or upsert failed.")
 			logging.error("Thread: " + self.name + " " + str(e))
 		self.running = False
 			
 
+	def update(self):
+		#self.running = True
+		logging.info("Thread: " + self.name + " " + str(len(self.zoneDictUpdate)) + " to update.")
+		self.sqlh.updateDomain(self.zoneDictUpdate)
+		logging.info("Thread: " + self.name + " update domains finished.")
+		#self.running = False
 		
-		
-		
+	def insert(self):
+		#self.running = True
+		logging.info("Thread: " + self.name + " " + str(len(self.zoneDictResult)) + " to insert.")
+		self.sqlh.insertDomain(self.zoneDictResult)
+		logging.info("Thread: " + self.name + " insert domains finished.")
+		#self.running = False		
 		
 		
 		
