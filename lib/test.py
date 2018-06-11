@@ -5,12 +5,85 @@ import time
 import os
 import logging
 
-maxthreads = 10
+maxthreads = 15
 TIMESTAMP = "2018-04-05 22:46:11"
+
+def doit3(zonefile):
+	ts = zonefile.split("/")[-1][:14]
+	ts = ts[0:4] + "-" + ts[4:6] + "-" + ts[6:8] + " " + ts[8:10] + ":" + ts[10:12] + ":" + ts[12:14]
+	
+	LOGFILE = os.path.join(os.path.dirname(__file__),'..','var','zone2db.log')
+	logging.basicConfig(format='%(asctime)s [%(levelname)s]: %(message)s', filename=LOGFILE, level=logging.INFO)
+	logging.info("doit2 started")
+	z2d = zone2db.Zone2DB(zonefile)
+	logging.info("reading zonefile to array")
+	arr = z2d.readZonefile2arr(maxsize=100000000)
+	db = zone2db.SQLHelper("000")
+	db.insertRecDiff(cleanup(arr),ts)
+	
+def cleanup(arr):
+	arrr2 = []
+	lc =0
+	rc =0
+	for line in arr[0]:
+			lc += 1
+			line = line.split(";")
+			if (len(line[0]) != 0):
+				if (line[0] != "" and line[0] != "\n"):
+					rec = recsplit(line[0])
+					arrr2.append([rec[0],rec[1],rec[2],rec[3]])
+					rc += 1
+	print "lc: " + str(lc)
+	print "rc: " + str(rc)				
+	return arrr2
+
+
+def recsplit(line):
+		line = line.replace("\t"," ").split()
+		value = ""
+		for x in line[4:]:
+			value = value + x + " "
+		value = value[:len(value)-1]
+		# return [domain, ttl, rectype, value]
+		return [line[0], int(line[1]), line[3].lower(), value]
+
+
+
+
+
+
+
+
+
+
+def doit2(zonefile):
+	LOGFILE = os.path.join(os.path.dirname(__file__),'..','var','zone2db.log')
+	logging.basicConfig(format='%(asctime)s [%(levelname)s]: %(message)s', filename=LOGFILE, level=logging.INFO)
+	logging.info("doit2 started")
+	z2d = zone2db.Zone2DB(zonefile)
+	logging.info("reading zonefile to array")
+	arr = z2d.readZonefile2arr()
+	logging.info(str(len(arr)) + " packages to process")
+	domainDict = {}
+	threads = []
+	# Prepare threads
+	for x in range(0,maxthreads):
+		threads.append(parsethread(TIMESTAMP,"Thread " + str(x)))
+	# Select IDs	
+	while arr != []:
+		logging.info(str(len(arr)) + " packages to process")
+		for x in threads:
+			if x.isRunning() == False:
+				if arr == []:
+					break
+				thread.start_new_thread(x.parse2, (arr.pop(),))
+		if arr == []:
+			break
+		time.sleep(2)
 
 def doit(zonefile):
 	LOGFILE = os.path.join(os.path.dirname(__file__),'..','var','zone2db.log')
-	logging.basicConfig(format='%(asctime)s %(message)s', filename=LOGFILE, level=logging.INFO)
+	logging.basicConfig(format='%(asctime)s [%(levelname)s]: %(message)s', filename=LOGFILE, level=logging.INFO)
 	z2d = zone2db.Zone2DB(zonefile)
 	logging.info("reading zonefile to array")
 	arr = z2d.readZonefile2arr()
@@ -126,7 +199,20 @@ class parsethread(object):
 			logging.error("Thread: " + self.name + " " + str(e))
 		self.running = False
 			
-
+	def parse2(self, arr):
+		self.running = True
+		logging.info("Thread: " + self.name + " started.")
+		linearr = []
+		for x in arr:
+			linearr.append(self.recsplit(x))
+		self.sqlh.upsertRec(linearr)
+		logging.info("Thread: " + self.name + " finished.")
+		self.running = False
+		
+		
+		
+		
+		
 	def update(self):
 		#self.running = True
 		logging.info("Thread: " + self.name + " " + str(len(self.zoneDictUpdate)) + " to update.")
@@ -142,6 +228,7 @@ class parsethread(object):
 		#self.running = False		
 		
 		
-		
+if __name__ == "__main__":
+	doit3("../archives/se/20180407020001_zonedata.iis.se.zone")
 		
 		

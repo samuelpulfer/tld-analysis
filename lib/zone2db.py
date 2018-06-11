@@ -4,11 +4,55 @@ from psycopg2.extras import execute_batch
 import logging
 import os
 import sys
+import copy
 from datetime import datetime
 
 sys.path.append(os.path.join(os.path.dirname(__file__),'..','etc'))
 import settings
 
+
+arrtmp = {
+				'.':[],
+				'_':[],
+				'-':[],
+				'0':[],
+				'1':[],
+				'2':[],
+				'3':[],
+				'4':[],
+				'5':[],
+				'6':[],
+				'7':[],
+				'8':[],
+				'9':[],
+				'a':[],
+				'b':[],
+				'c':[],
+				'd':[],
+				'e':[],
+				'f':[],
+				'g':[],
+				'h':[],
+				'i':[],
+				'j':[],
+				'k':[],
+				'l':[],
+				'm':[],
+				'n':[],
+				'o':[],
+				'p':[],
+				'q':[],
+				'r':[],
+				's':[],
+				't':[],
+				'u':[],
+				'v':[],
+				'w':[],
+				'x':[],
+				'y':[],
+				'z':[]
+				}
+				
 class Zone2DB(object):
 	def __init__(self, zonefile):
 		self.zonefile = zonefile
@@ -38,6 +82,57 @@ class Zone2DB(object):
 					ai += 1
 		return arr
 		
+	def readZonefile2parsedArr(self):
+		arr = []
+		with open(self.zonefile, "r") as f:
+			for line in f:
+				line = line.split(";")
+				if (len(line[0]) != 0):
+					if (line[0] != "" and line[0] != "\n"):
+						arr.append(self.recsplit(line[0]))
+		return arr
+		
+	def readDB2ABC(self):
+		db = SQLHelper("")
+		dbresult = db.getAllActualRecs()
+		arr = copy.deepcopy(arrtmp)
+		for x in arr:
+			arr[x] = copy.deepcopy(arrtmp)
+		for x in dbresult:
+			arr[x[0][0]][x[0][1]].append(x)
+		del db
+		return arr
+		
+		
+		
+		
+		
+		
+		
+	def readZoneFile2ABC(self):
+		
+				
+		arr = copy.deepcopy(arrtmp)
+		for x in arr:
+			arr[x] = copy.deepcopy(arrtmp)
+		
+		
+		
+		
+		with open(self.zonefile, "r") as f:
+			for line in f:
+				line = line.split(";")
+				if (len(line[0]) != 0):
+					if (line[0] != "" and line[0] != "\n"):
+						rec = self.recsplit(line[0])
+						
+						arr[rec[0][0]][rec[0][1]].append(rec)
+		return arr
+				
+				
+				
+				
+				
 	def recsplit(self, line):
 		line = line.replace("\t"," ").split()
 		value = ""
@@ -108,6 +203,14 @@ class SQLHelper(object):
 		execute_batch(self.cur, "UPDATE domain SET checked=%s WHERE id=%s", params)
 		self.conn.commit()
 		
+	def updateDomain2(self,zonedict):
+		for domain in zonedict:
+			self.cur.execute("UPDATE domain SET checked=%s WHERE id=%s RETURNING id", (self.timestamp, zonedict[domain]['fk']))
+			retid = self.cur.fetchone()[0]
+			if zonedict[domain]['fk'] != retid:
+				logging.error("fk id missmatch at " + domain + " expect " + str(zonedict[domain]['fk']) + " but received " + str(retid))
+		self.conn.commit()
+		
 	def insertDomain(self, zonedict):
 		for domain in zonedict:
 			self.cur.execute("INSERT INTO domain (name,created,checked) VALUES (%s,%s,%s) RETURNING id", (domain, self.timestamp, self.timestamp))
@@ -122,6 +225,31 @@ class SQLHelper(object):
 			params.append([domain,self.timestamp])
 		execute_batch(self.cur, "SELECT upsert_domain(%s,%s)", params)
 		self.conn.commit()
+		
+	def upsertRec(self, arr):
+		for x in arr:
+			if x[2] == "soa":
+				pass
+			else:
+				self.cur.execute("SELECT upsert_" + x[2] + "(%s,%s,%s,%s)", (x[0], x[1], x[3], self.timestamp))
+				if self.cur.fetchone()[0] == 0:
+					logging.error("Could not upsert: " + str(x))
+		self.conn.commit()
+		
+	def insertRecFlat(self, arr, ts):
+		execute_batch(self.cur, "INSERT INTO recordflat (name,rectype,ttl,value,created) VALUES (%s,%s,%s,%s,'"+ts+"')", arr)
+		self.conn.commit()
+		
+	def insertRecDiff(self, arr, ts):
+		execute_batch(self.cur, "INSERT INTO dnsdiff (name,ttl,rectype,value,created) VALUES (%s,%s,%s,%s,'"+ts+"')", arr)
+		self.conn.commit()
+	def updateRecDiff(self, arr, ts):
+		execute_batch(self.cur, "UPDATE dnsdiff SET deleted = '"+ts+"' WHERE name=%s AND ttl=%s AND rectype=%s AND value=%s AND deleted IS NULL", arr)
+		self.conn.commit()
+		
+	def getAllActualRecs(self):
+		self.cur.execute("SELECT name,ttl,rectype,value FROM dnsdiff WHERE deleted IS NULL")
+		return self.cur.fetchall()
 
 
 
