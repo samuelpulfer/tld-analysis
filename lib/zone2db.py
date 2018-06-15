@@ -99,7 +99,7 @@ class Zone2DB(object):
 		for x in arr:
 			arr[x] = copy.deepcopy(arrtmp)
 		for x in dbresult:
-			arr[x[0][0]][x[0][1]].append(x)
+			arr[x[1][0]][x[1][1]].append(list(x))
 		del db
 		return arr
 		
@@ -240,16 +240,19 @@ class SQLHelper(object):
 		execute_batch(self.cur, "INSERT INTO recordflat (name,rectype,ttl,value,created) VALUES (%s,%s,%s,%s,'"+ts+"')", arr)
 		self.conn.commit()
 		
-	def insertRecDiff(self, arr, ts):
-		execute_batch(self.cur, "INSERT INTO dnsdiff (name,ttl,rectype,value,created) VALUES (%s,%s,%s,%s,'"+ts+"')", arr)
+	def insertRecDiff(self, arr):
+		execute_batch(self.cur, "INSERT INTO dnsdiff (name,ttl,rectype,value,created) VALUES (%s,%s,%s,%s,'"+self.timestamp+"')", arr)
 		self.conn.commit()
 	def updateRecDiff(self, arr, ts):
 		execute_batch(self.cur, "UPDATE dnsdiff SET deleted = '"+ts+"' WHERE name=%s AND ttl=%s AND rectype=%s AND value=%s AND deleted IS NULL", arr)
 		self.conn.commit()
 		
 	def getAllActualRecs(self):
-		self.cur.execute("SELECT name,ttl,rectype,value FROM dnsdiff WHERE deleted IS NULL")
+		self.cur.execute("SELECT id,name,ttl,rectype,value FROM dnsdiff WHERE deleted IS NULL")
 		return self.cur.fetchall()
+		
+	def delRecsById(self, arr):
+		execute_batch(self.cur, "UPDATE dnsdiff SET deleted = '" + self.timestamp + "' WHERE id=%s", arr)
 
 
 
