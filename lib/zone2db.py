@@ -253,6 +253,36 @@ class SQLHelper(object):
 		
 	def delRecsById(self, arr):
 		execute_batch(self.cur, "UPDATE dnsdiff SET deleted = '" + self.timestamp + "' WHERE id=%s", arr)
+		
+		
+		
+		
+		
+		
+	def recdelAtTs(self, ts):
+		self.cur.execute("SELECT rectype, COUNT(id) FROM dnsdiff WHERE deleted ='"+ts+"' GROUP BY rectype ORDER BY rectype")
+		return self.cur.fetchall()
+		
+	def recnewAtTs(self, ts):
+		self.cur.execute("SELECT rectype, COUNT(id) FROM dnsdiff WHERE created ='"+ts+"' GROUP BY rectype ORDER BY rectype")
+		return self.cur.fetchall()
+		
+	def getCreateTimes(self):
+		self.cur.execute("select distinct created from dnsdiff order by created")
+		return self.cur.fetchall()
+		
+	def recsdelAtTs(self,ts):
+		self.cur.execute("SELECT COUNT(*) FROM dnsdiff WHERE deleted ='"+ts+"'")
+		return self.cur.fetchall()
+	def recsnewAtTs(self,ts):
+		self.cur.execute("SELECT COUNT(*) FROM dnsdiff WHERE created ='"+ts+"'")
+		return self.cur.fetchall()
+	def recsAtTs(self,ts):
+		self.cur.execute("Select count(*) from dnsdiff where created <= '"+ts+"' AND (deleted IS NULL OR deleted > '"+ts+"')")
+		return self.cur.fetchall()
+	def domainsAtTs(self,ts):
+		self.cur.execute("SELECT COUNT(s.name) FROM (SELECT DISTINCT name FROM dnsdiff WHERE created <= '"+ts+"' AND (deleted IS NULL OR deleted > '"+ts+"')) AS s")
+		return self.cur.fetchall()
 
 
 

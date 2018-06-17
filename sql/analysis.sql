@@ -20,3 +20,20 @@ SELECT COUNT(id), rectype FROM dnsdiff WHERE deleted IS NULL GROUP BY rectype OR
 --       1 | soa
 --       1 | srv
 --      11 | txt
+
+-- state at time x
+Select count(*) from dnsdiff where created <= '2018-04-15 02:00:01' AND (deleted IS NULL OR deleted > '2018-04-15 02:00:01');
+
+-- number of domains at time x
+SELECT COUNT(s.name) FROM (SELECT DISTINCT name FROM dnsdiff WHERE created <= '2018-04-15 02:00:01' AND (deleted IS NULL OR deleted > '2018-04-15 02:00:01')) AS s;
+
+
+-- RecType with count deleted at time x
+SELECT COUNT(id), rectype FROM dnsdiff WHERE deleted ='2018-04-15 02:00:01' GROUP BY rectype ORDER BY rectype; 
+
+-- RecType with count created at time x
+SELECT COUNT(id), rectype FROM dnsdiff WHERE created ='2018-04-15 02:00:01' GROUP BY rectype ORDER BY rectype;
+
+
+-- New Domains
+SELECT COUNT(s.name) FROM (SELECT DISTINCT name FROM dnsdiff WHERE created >= '2018-04-15 02:00:01') AS s;
