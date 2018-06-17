@@ -283,6 +283,10 @@ class SQLHelper(object):
 	def domainsAtTs(self,ts):
 		self.cur.execute("SELECT COUNT(s.name) FROM (SELECT DISTINCT name FROM dnsdiff WHERE created <= '"+ts+"' AND (deleted IS NULL OR deleted > '"+ts+"')) AS s")
 		return self.cur.fetchall()
+		
+	def getrrsig(self,name):
+		self.cur.execute("SELECT name,ttl,value,created,deleted FROM dnsdiff WHERE rectype='rrsig' AND name='"+name+"' ORDER BY value,created")
+		return self.cur.fetchall()
 
 
 
